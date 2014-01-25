@@ -1,28 +1,13 @@
 #include"global.h"
 
+
 #define GROUPED_HASHES  (32)
 
 void metiscoin_process(minerMetiscoinBlock_t* block)
 {
-    sph_keccak512_context ctx_keccak_init;
-    //sph_keccak512_init(&ctx_keccak_init);
-    //sph_keccak512(&ctx_keccak_init, &block->version, 80 - 4);
-    
-    // shavite512
-    sph_shavite512_context ctx_shavite_init;
-    sph_shavite512_init(&ctx_shavite_init);
-    
-    // metis512
-    sph_metis512_context ctx_metis_init;
-    sph_metis512_init(&ctx_metis_init);
-    
-    
-    // "Working" sets
-    sph_keccak512_context   ctx_keccak;
-    sph_shavite512_context  ctx_shavite;
-    sph_metis512_context    ctx_metis;
-    
-
+	sph_keccak512_context	 ctx_keccak;
+	sph_shavite512_context	 ctx_shavite;
+	hashState	 ctx_metis;
 	static unsigned char pblank[1];
 	block->nonce = 0;
 
@@ -49,16 +34,16 @@ void metiscoin_process(minerMetiscoinBlock_t* block)
 		}
 		for(uint32 i=0; i<GROUPED_HASHES; i++)
 		{
-		  memcpy(&ctx_shavite, &ctx_shavite_init, sizeof(sph_shavite512_context));
+		  sph_shavite512_init(&ctx_shavite);
 		  sph_shavite512(&ctx_shavite, hash0+i*8, 64);
 		  sph_shavite512_close(&ctx_shavite, hash0+i*8);
 		}
 		block->nonce = n*0x10000+f;
 		for(uint32 i=0; i<GROUPED_HASHES; i++)
 		{
-		  memcpy(&ctx_metis,   &ctx_metis_init,   sizeof(sph_metis512_context)  );
-		  sph_metis512(&ctx_metis, hash0+i*8, 64);
-		  sph_metis512_close(&ctx_metis, hash2);
+		  Init(&ctx_metis, 512);
+		  Update(&ctx_metis, hash0+i*8, 64);
+		  Final(&ctx_metis, hash2);
 		  if( *(uint32*)((uint8*)hash2+28) <= target )
 		  {
 			totalShareCount++;
