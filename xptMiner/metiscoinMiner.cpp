@@ -1,5 +1,6 @@
 #include"global.h"
-
+#include"vperm.h"
+#include"fugue_vperm.h"
 
 #define GROUPED_HASHES  (32)
 
