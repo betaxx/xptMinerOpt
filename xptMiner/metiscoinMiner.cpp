@@ -13,8 +13,8 @@ void metiscoin_process(minerMetiscoinBlock_t* block)
 	block->nonce = 0;
 
 	uint32 target = *(uint32*)(block->targetShare+28);
-	uint64 hash0[8*GROUPED_HASHES];
-	uint64 hash2[8];
+	uint64_t hash0[8*GROUPED_HASHES];
+	uint64_t hash2[8];
 	// since only the nonce changes we can calculate the first keccak round in advance
 	unsigned long long keccakPre[25];
 	sph_keccak512_init(&ctx_keccak);
